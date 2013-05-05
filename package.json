@@ -1,0 +1,33 @@
+{
+  "name": "Timer",
+  "description": "Just a stopwatch-like timer class",
+  "version": "0.0.1",
+  "private": true,
+  "author": "Brian Frichette",
+  "homepage": "",
+  "contributors": [ "Brian Frichette <brian.frichette@gmail.com> (https://github.com/brian-frichette)" ],
+  "bugs": { "url": "" },
+  "scripts": { "start": "nodemon app.js" },
+  "dependencies": {
+    "express": "3.x",
+    "jade": "*",
+    "less-middleware": "*",
+    "lodash": "1.x"
+  },
+  "devDependencies": {
+    "grunt": "0.4.x",
+    "karma": ">=0.8",
+    "grunt-contrib-uglify": ">=0.2",
+    "grunt-contrib-concat": ">=0.1.3",
+    "grunt-contrib-watch": ">=0.3",
+    "grunt-contrib-jshint": ">=0.3",
+    "async": "0.1.x",
+    "nodemon": "*"
+  },
+  "keywords": [],
+  "repository": "",
+  "licenses": [{
+    "type": "MIT",
+    "url": "http://opensource.org/licenses/MIT"
+  }]
+}
