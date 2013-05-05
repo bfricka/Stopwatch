@@ -20,8 +20,12 @@
     , "nodemon": "*"
   }
 
-  , "keywords": []
-  , "repository": ""
+  , "keywords": ["timer", "stopwatch", "util", "time", "duration", "counter", "countdown"]
+  , "main": "./dist/node/Timer"
+  , "repository": {
+    "type": "git"
+    , "url":"git://github.com/brian-frichette/Stopwatch.git"
+  }
 
   , "licenses": [{"type": "MIT", "url": "http://opensource.org/licenses/MIT"}]
 }
