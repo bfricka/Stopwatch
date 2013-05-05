@@ -11,8 +11,6 @@
 *~
 *.sass-cache
 
-node_modules
-
 # OS or Editor folders
 .DS_Store
 ._*
@@ -36,6 +34,5 @@ nbproject
 .CVS
 .idea
 node_modules
-dist
 
 .tern*
