@@ -10,16 +10,24 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json')
 
     , meta: {
-      banner: [
-          "/** <%= pkg.name %> - v<%= pkg.version %> - <%= pkg.homepage %>\n"
-        , "  * Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author %>. All rights reserved.\n"
-        , "  * Licensed <%= _.pluck(pkg.licenses, 'type')[0] %> - <%= _.pluck(pkg.licenses, 'url')[0] %>\n"
-        , "  *\n"
-        , "  * EventEmitter - git.io/ee\n"
-        , "  * Oliver Caldwell\n"
-        , "  * MIT license\n"
-        , "  */\n"
-      ].join('')
+      banner: (function(){
+        var node = [
+            "/** <%= pkg.name %> - v<%= pkg.version %> - <%= pkg.homepage %>\n"
+          , "  * Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author %>. All rights reserved.\n"
+          , "  * Licensed <%= _.pluck(pkg.licenses, 'type')[0] %> - <%= _.pluck(pkg.licenses, 'url')[0] %>\n"
+        ]
+        , browser = node.concat([
+            "  *\n"
+          , "  * EventEmitter - git.io/ee\n"
+          , "  * Oliver Caldwell\n"
+          , "  * MIT license\n"
+        ]);
+
+        return {
+            node: node.concat(["  */\n"]).join('')
+          , browser: browser.concat(["  */\n"]).join('')
+        };
+      }())
     }
 
     , paths: {
@@ -30,19 +38,31 @@ module.exports = function(grunt) {
 
     , concat: {
       app: {
-        src: [
-            "<%= paths.lib %>/EventEmitter/EventEmitter.js"
-          , "<%= paths.lib %>/Timer.js"
-        ]
-
-        , dest: "<%= paths.dist %>/Timer.js"
+        files: {
+            "<%= paths.dist %>/node/Timer.js": [ "<%= paths.lib %>/NodeEmitter.js", "<%= paths.lib %>/Timer.js" ]
+          , "<%= paths.dist %>/browser/Timer.js": [ "<%= paths.lib %>/EventEmitter/EventEmitter.js", "<%= paths.lib %>/Timer.js" ]
+        }
       }
 
-      , build: {
-          options: { banner: "<%= meta.banner %>" }
+      , build_node: {
+          options: { banner: "<%= meta.banner.node %>" }
         , files: {
-            "<%= paths.dist %>/Timer.js": [ "<%= paths.dist %>/Timer.js" ]
-          , "<%= paths.dist %>/Timer.min.js": [ "<%= paths.dist %>/Timer.min.js" ]
+          "<%= paths.dist %>/node/Timer.js": [ "<%= paths.dist %>/node/Timer.js" ]
+        }
+      }
+
+      , build_browser: {
+        options: {
+            banner: "<%= meta.banner.browser %>"
+            // Strip EventEmitter banner since we are manually re-adding it
+          , process: function(src) {
+            return src.replace(/(^|\n)\/([\*\s])+EventEmitter([\s\w\.\/\*-]+)([@\w\s]+)\*\//g, '');
+          }
+        }
+
+        , files: {
+            "<%= paths.dist %>/browser/Timer.js": [ "<%= paths.dist %>/browser/Timer.js" ]
+          , "<%= paths.dist %>/browser/Timer.min.js": [ "<%= paths.dist %>/browser/Timer.min.js" ]
         }
       }
     }
@@ -90,7 +110,7 @@ module.exports = function(grunt) {
           }
         }
         , files: {
-          "<%= paths.dist %>/Timer.min.js": [ "<%= paths.dist %>/Timer.js" ]
+          "<%= paths.dist %>/browser/Timer.min.js": [ "<%= paths.dist %>/browser/Timer.js" ]
         }
 
       }
@@ -109,7 +129,8 @@ module.exports = function(grunt) {
     "concat:app"
     , "jshint"
     , "uglify"
-    , "concat:build"
+    , "concat:build_node"
+    , "concat:build_browser"
     , "test"
   ]);
 
