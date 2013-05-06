@@ -52,6 +52,10 @@ stopwatch.on('tick', function(){
   console.log('Tick!');
 });
 
+stopwatch.restart();
+// Tick!
+// Tick!
+
 ```
 
 ### Other methods
