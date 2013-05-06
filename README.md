@@ -7,7 +7,7 @@ Stopwatch is a simple stopwatch-like timer that can emit events. It currently wo
 ### Creating instances
 ```javascript
 // Node
-var Stopwatch = require('stopwatch-emitter');
+var Stopwatch = require('stopwatch-emitter').Stopwatch;
 var stopwatch1 = new Stopwatch('5m');
 var stopwatch2 = new Stopwatch('30s');
 
