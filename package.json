@@ -1,10 +1,10 @@
 {
   "name": "stopwatch-emitter"
   , "description": "Just a stopwatch-like timer class"
-  , "version": "0.0.1"
+  , "version": "0.0.2"
   , "private": false
   , "author": "Brian Frichette"
-  , "homepage": "https://github.com/brian-frichette/Timer"
+  , "homepage": "https://github.com/brian-frichette/Stopwatch"
   , "contributors": [ "Brian Frichette <brian.frichette@gmail.com> (https://github.com/brian-frichette)" ]
   , "bugs": { "url": "https://github.com/brian-frichette/Stopwatch/issues" }
   , "dependencies": {}
@@ -22,7 +22,7 @@
   }
 
   , "keywords": ["timer", "stopwatch", "util", "time", "duration", "counter", "countdown"]
-  , "main": "./dist/node/Timer"
+  , "main": "./dist/node/Stopwatch"
   , "repository": {
     "type": "git"
     , "url":"git://github.com/brian-frichette/Stopwatch.git"

@@ -6,6 +6,6 @@ basePath = '.';
 files = [
   JASMINE
   , JASMINE_ADAPTER
-  , '../dist/browser/Timer.js'
+  , '../dist/browser/Stopwatch.js'
   , './**/*.spec.js'
 ];

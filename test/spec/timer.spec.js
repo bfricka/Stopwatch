@@ -105,4 +105,84 @@ describe('Stopwatch behavior', function(){
 
     expect(stopwatchCallback).toHaveBeenCalled();
   });
+
+  it('should call tick callback correctly', function(){
+    var totalTicks = 0;
+    var stopwatch = new Stopwatch('5s');
+
+    stopwatch.on('tick', function(){
+      totalTicks++;
+    });
+
+    stopwatch.start();
+
+    jasmine.Clock.tick(5000);
+    expect(totalTicks).toEqual(5);
+  });
+
+  it('should only emit "stop" once when method is called and once when timer runs out', function(){
+    var stopCalled = 0;
+    var stopwatch = new Stopwatch('5s');
+
+    stopwatch.on('stop', function(){
+      stopCalled++;
+    });
+
+    stopwatch.start();
+    jasmine.Clock.tick(4000);
+    stopwatch.stop();
+
+    expect(stopCalled).toEqual(1);
+
+    stopwatch.restart();
+    jasmine.Clock.tick(5000);
+
+    expect(stopCalled).toEqual(2);
+  });
+});
+
+describe('Stopwatch getters and booleans', function() {
+  var stopwatch;
+
+  beforeEach(function(){
+    stopwatch = new Stopwatch('60s');
+    jasmine.Clock.useMock();
+  });
+
+  it('should report the correct getters for start, max, and remaining', function(){
+    stopwatch.start();
+    jasmine.Clock.tick(5000);
+
+    expect(stopwatch.getCurrentTime()).toEqual(5);
+    expect(stopwatch.getRemainingTime()).toEqual(55);
+    expect(stopwatch.getMaxTime()).toEqual(60);
+  });
+
+  it('should correctly report if it is running or not', function(){
+    expect(stopwatch.isRunning()).toBe(false);
+
+    stopwatch.start();
+    expect(stopwatch.isRunning()).toBe(true);
+  });
+
+  it('should correctly report if is not running when paused', function(){
+    expect(stopwatch.isRunning()).toBe(false);
+
+    stopwatch.start();
+    jasmine.Clock.tick(5000);
+    stopwatch.pause();
+
+    expect(stopwatch.isRunning()).toBe(false);
+  });
+
+  it('should correctly report if it not running when stopped', function(){
+    stopwatch.start();
+    jasmine.Clock.tick(5000);
+    stopwatch.stop();
+    expect(stopwatch.isRunning()).toBe(false);
+
+    stopwatch.restart();
+    jasmine.Clock.tick(60000);
+    expect(stopwatch.isRunning()).toBe(false);
+  });
 });

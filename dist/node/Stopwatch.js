@@ -22,9 +22,14 @@ EventEmitter = require('events').EventEmitter;
     _extends(Stopwatch, _super);
 
     function Stopwatch(maxTime) {
+      // Set defaults
       if (maxTime == null) maxTime = '5m';
       this.currentTime = 0;
+      this._stopEmitted = false;
+      this._running = false;
+
       this.parseTime(maxTime);
+      this._setupEvents();
     }
 
     var proto = Stopwatch.prototype;
@@ -48,18 +53,28 @@ EventEmitter = require('events').EventEmitter;
       this.maxTime = Math.round(timeValue);
     };
 
+    proto._setupEvents = function() {
+      var self = this;
+      this.on('stop', function(){ self._stopEmitted = true; });
+
+      var stopCb = function() { self._stopEmitted = false; };
+      this.on('start', stopCb);
+      this.on('pause', stopCb);
+      this.on('restart', stopCb);
+    };
+
     proto.tick = function() {
       var self = this;
 
       if (self.currentTime >= self.maxTime) {
-        self.emit('stop');
+        if (!self._stopEmitted) self.emit('stop');
+        self._running = false;
         return;
       }
 
-      if (!self.running) {
-        self.emit('pause');
-        return;
-      }
+      if (!self._running) return;
+
+      self.emit('tick');
 
       setTimeout(function(){
         self.currentTime++;
@@ -68,12 +83,12 @@ EventEmitter = require('events').EventEmitter;
     };
 
     proto.pause = function() {
-      this.running = false;
+      this._running = false;
       this.emit('pause');
     };
 
     proto.stop = function() {
-      this.running = false;
+      this._running = false;
       this.currentTime = 0;
       this.emit('stop');
     };
@@ -87,7 +102,7 @@ EventEmitter = require('events').EventEmitter;
     proto.start = function(emit) {
       if (emit == null) emit = true;
       if (emit) this.emit('start');
-      this.running = true;
+      this._running = true;
       this.tick();
     };
 
@@ -101,6 +116,10 @@ EventEmitter = require('events').EventEmitter;
 
     proto.getMaxTime = function() {
       return this.maxTime;
+    };
+
+    proto.isRunning = function() {
+      return !!this._running;
     };
 
     return Stopwatch;
