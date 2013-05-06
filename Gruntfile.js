@@ -1,6 +1,5 @@
-var karma = require('karma');
-
 module.exports = function(grunt) {
+  grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -73,12 +72,12 @@ module.exports = function(grunt) {
             "<%= paths.lib %>/EventEmitter/EventEmitter.js"
             , "<%= paths.lib %>/Timer.js"
           ]
-        , tasks: [ "jshint", "uglify", "test" ]
+        , tasks: [ "concat:app", "jshint", "uglify", "karma:unit:run" ]
       }
 
       , test: {
           files: [ "<%= paths.test %>/**/*.spec.js" ]
-        , tasks: [ "test" ]
+        , tasks: [ "karma:unit:run" ]
       }
     }
 
@@ -123,6 +122,15 @@ module.exports = function(grunt) {
         , "<%= paths.lib %>/Timer.js"
       ]
     }
+
+    , karma: {
+      unit: {
+        configFile: '<%= paths.test %>/karma.conf.js'
+        , runnerPort: 9999
+        , autoWatch: false
+        , browsers: ['Chrome']
+      }
+    }
   });
 
   grunt.registerTask('default', [
@@ -131,10 +139,6 @@ module.exports = function(grunt) {
     , "uglify"
     , "concat:build_node"
     , "concat:build_browser"
-    , "test"
+    , "karma"
   ]);
-
-  grunt.registerTask('test', 'Run tests in Karma', function(){
-    console.log("test");
-  });
 };

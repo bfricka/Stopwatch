@@ -1,12 +1,9 @@
-/** stopwatch-emitter - v0.0.1 - https://github.com/brian-frichette/Timer
-  * Copyright (c) 2013 Brian Frichette. All rights reserved.
-  * Licensed MIT - http://opensource.org/licenses/MIT
-  *
-  * EventEmitter - git.io/ee
-  * Oliver Caldwell
-  * MIT license
-  */
-
+/**
+ * EventEmitter v4.0.5 - git.io/ee
+ * Oliver Caldwell
+ * MIT license
+ * @preserve
+ */
 
 ;(function(exports) {
     // JSHint config - http://www.jshint.com/
@@ -343,68 +340,80 @@
       this.parseTime(maxTime);
     }
 
-    Timer.prototype = {
-      parseTime: function(time) {
-        time = time.toString.match(/([\d\.]+)(\w{1})/);
+    var proto = Timer.prototype;
 
-        var timeValue = parseFloat(time[1], 10)
-          , timeInterval = time[2];
+    proto.parseTime = function(time) {
+      time = time.toString().match(/([\d\.]+)(\w{1})/);
 
-        switch (timeInterval) {
-          case 's':
-            timeValue *= 1;
-            break;
-          case 'm':
-            timeValue *= 60;
-            break;
-          case 'h':
-            timeValue *= 60 * 60;
-        }
-        this.maxTime = Math.round(timeValue);
+      var timeValue = parseFloat(time[1], 10)
+        , timeInterval = time[2];
+
+      switch (timeInterval) {
+        case 's':
+          timeValue *= 1;
+          break;
+        case 'm':
+          timeValue *= 60;
+          break;
+        case 'h':
+          timeValue *= 60 * 60;
+      }
+      this.maxTime = Math.round(timeValue);
+    };
+
+    proto.tick = function() {
+      var self = this;
+
+      if (self.currentTime >= self.maxTime) {
+        self.emit('stop');
+        return;
       }
 
-      , tick: function() {
-        var self = this;
-
-        if (self.currentTime >= self.maxTime) {
-          self.emit('stop');
-          return;
-        }
-
-        if (!self.running) {
-          self.emit('pause');
-          return;
-        }
-
-        setTimeout(function(){
-          self.currentTime++;
-          self.tick();
-        }, 1000);
+      if (!self.running) {
+        self.emit('pause');
+        return;
       }
 
-      , pause: function() {
-        this.running = false;
-        this.emit('pause');
-      }
+      setTimeout(function(){
+        self.currentTime++;
+        self.tick();
+      }, 1000);
+    };
 
-      , stop: function() {
-        this.running = false;
-        this.currentTime = 0;
-        this.emit('stop');
-      }
+    proto.pause = function() {
+      this.running = false;
+      this.emit('pause');
+    };
 
-      , restart: function() {
-        this.currentTime = 0;
-        this.start(false);
-        this.emit('restart');
-      }
+    proto.stop = function() {
+      this.running = false;
+      this.currentTime = 0;
+      this.emit('stop');
+    };
 
-      , start: function(emit) {
-        if (emit == null) emit = true;
-        if (emit) this.emit('start');
-        this.running = true;
-        this.tick();
-      }
+    proto.restart = function() {
+      this.currentTime = 0;
+      this.start(false);
+      this.emit('restart');
+    };
+
+    proto.start = function(emit) {
+      if (emit == null) emit = true;
+      if (emit) this.emit('start');
+      this.running = true;
+      this.tick();
+    };
+
+    proto.getCurrentTime = function() {
+      return this.currentTime;
+    };
+
+    proto.getRemainingTime = function() {
+      return this.maxTime - this.currentTime;
+    };
+
+    proto.getMaxTime = function() {
+      return this.maxTime;
     };
 
     return Timer;
