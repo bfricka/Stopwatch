@@ -1,3 +1,4 @@
+EventEmitter = require('events').EventEmitter;
 /* global EventEmitter, Timer */
 
 (function(exports){
@@ -17,16 +18,16 @@
       return child;
     };
 
-  var Timer = (function(_super){
-    _extends(Timer, _super);
+  var Stopwatch = (function(_super){
+    _extends(Stopwatch, _super);
 
-    function Timer(maxTime) {
+    function Stopwatch(maxTime) {
       if (maxTime == null) maxTime = '5m';
       this.currentTime = 0;
       this.parseTime(maxTime);
     }
 
-    var proto = Timer.prototype;
+    var proto = Stopwatch.prototype;
 
     proto.parseTime = function(time) {
       time = time.toString().match(/([\d\.]+)(\w{1})/);
@@ -102,8 +103,8 @@
       return this.maxTime;
     };
 
-    return Timer;
+    return Stopwatch;
   }(EventEmitter));
 
-  exports.Timer = Timer;
+  exports.Stopwatch = Stopwatch;
 }(this));

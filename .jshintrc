@@ -20,7 +20,7 @@
   , "laxcomma" : true
   , "laxbreak" : true
   , "globals"  : {
-      "Timer"        : true
+      "Stopwatch"    : true
     , "EventEmitter" : true
   }
 }

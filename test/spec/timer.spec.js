@@ -1,47 +1,47 @@
 /* jshint undef: false */
 
-describe('Timer defaults', function(){
-  var timer;
+describe('Stopwatch defaults', function(){
+  var stopwatch;
 
   beforeEach(function(){
-    timer = new Timer();
+    stopwatch = new Stopwatch();
   });
 
-  it('should be an instance of Timer', function(){
-    var isInstance = timer instanceof Timer;
+  it('should be an instance of Stopwatch', function(){
+    var isInstance = stopwatch instanceof Stopwatch;
     expect(isInstance).toEqual(true);
   });
 
   it('should start at 0', function(){
-    expect(timer.getCurrentTime()).toEqual(0);
+    expect(stopwatch.getCurrentTime()).toEqual(0);
   });
 
   it('should have a default time of 5m (300 seconds)', function() {
-    expect(timer.getMaxTime()).toEqual(300);
+    expect(stopwatch.getMaxTime()).toEqual(300);
   });
 
   it('should fire a start event when started', function(){
     var startFired = false;
-    timer.on('start', function(){ startFired = true; });
-    timer.start();
+    stopwatch.on('start', function(){ startFired = true; });
+    stopwatch.start();
 
     expect(startFired).toBe(true);
   });
 
   it('should fire a stop event when stopped', function(){
     var stopFired = false;
-    timer.on('stop', function(){ stopFired = true; });
-    timer.start();
-    timer.stop();
+    stopwatch.on('stop', function(){ stopFired = true; });
+    stopwatch.start();
+    stopwatch.stop();
 
     expect(stopFired).toBe(true);
   });
 
   it('should fire a pause event', function(){
     var pauseFired = false;
-    timer.on('pause', function(){ pauseFired = true; });
-    timer.start();
-    timer.pause();
+    stopwatch.on('pause', function(){ pauseFired = true; });
+    stopwatch.start();
+    stopwatch.pause();
 
     expect(pauseFired).toBe(true);
   });
@@ -50,59 +50,59 @@ describe('Timer defaults', function(){
     var restartFired = false
     , startFired = false;
 
-    timer.on('restart', function(){ restartFired = true; });
-    timer.on('start', function(){ startFired = true; });
+    stopwatch.on('restart', function(){ restartFired = true; });
+    stopwatch.on('start', function(){ startFired = true; });
 
-    timer.restart();
+    stopwatch.restart();
 
     expect(restartFired).toBe(true);
     expect(startFired).toBe(false);
   });
 });
 
-describe('Timer parseTime', function(){
+describe('Stopwatch parseTime', function(){
   // Use a single instance and just place with parseTime
-  var timer = new Timer();
+  var stopwatch = new Stopwatch();
 
   it('should parse seconds correctly', function(){
-    timer.parseTime('5s');
-    expect(timer.getMaxTime()).toEqual(5);
+    stopwatch.parseTime('5s');
+    expect(stopwatch.getMaxTime()).toEqual(5);
   });
 
   it('should parse minutes correctly', function(){
-    timer.parseTime('2m');
-    expect(timer.getMaxTime()).toEqual(120);
+    stopwatch.parseTime('2m');
+    expect(stopwatch.getMaxTime()).toEqual(120);
   });
 
   it('should parse hours correctly', function(){
-    timer.parseTime('1h');
-    expect(timer.getMaxTime()).toEqual(3600);
+    stopwatch.parseTime('1h');
+    expect(stopwatch.getMaxTime()).toEqual(3600);
   });
 
   it('should also parse floats correctly', function(){
-    timer.parseTime('0.5h');
-    expect(timer.getMaxTime()).toEqual(1800);
+    stopwatch.parseTime('0.5h');
+    expect(stopwatch.getMaxTime()).toEqual(1800);
   });
 });
 
-describe('Timer behavior', function(){
-  var timerCallback;
+describe('Stopwatch behavior', function(){
+  var stopwatchCallback;
 
   beforeEach(function(){
-    timerCallback = jasmine.createSpy('timerCallback');
+    stopwatchCallback = jasmine.createSpy('stopwatchCallback');
     jasmine.Clock.useMock();
   });
 
   it('should stop at maxTime and fire callback', function(){
-    var timer = new Timer('5s');
+    var stopwatch = new Stopwatch('5s');
 
-    timer.on('stop', function(){ timerCallback(); });
-    expect(timerCallback).not.toHaveBeenCalled();
+    stopwatch.on('stop', function(){ stopwatchCallback(); });
+    expect(stopwatchCallback).not.toHaveBeenCalled();
 
-    timer.start();
+    stopwatch.start();
     // Tick 5 seconds
     jasmine.Clock.tick(5000);
 
-    expect(timerCallback).toHaveBeenCalled();
+    expect(stopwatchCallback).toHaveBeenCalled();
   });
 });

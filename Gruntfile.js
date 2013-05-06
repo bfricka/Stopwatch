@@ -38,15 +38,15 @@ module.exports = function(grunt) {
     , concat: {
       app: {
         files: {
-            "<%= paths.dist %>/node/Timer.js": [ "<%= paths.lib %>/NodeEmitter.js", "<%= paths.lib %>/Timer.js" ]
-          , "<%= paths.dist %>/browser/Timer.js": [ "<%= paths.lib %>/EventEmitter/EventEmitter.js", "<%= paths.lib %>/Timer.js" ]
+            "<%= paths.dist %>/node/Stopwatch.js": [ "<%= paths.lib %>/NodeEmitter.js", "<%= paths.lib %>/Stopwatch.js" ]
+          , "<%= paths.dist %>/browser/Stopwatch.js": [ "<%= paths.lib %>/EventEmitter/EventEmitter.js", "<%= paths.lib %>/Stopwatch.js" ]
         }
       }
 
       , build_node: {
           options: { banner: "<%= meta.banner.node %>" }
         , files: {
-          "<%= paths.dist %>/node/Timer.js": [ "<%= paths.dist %>/node/Timer.js" ]
+          "<%= paths.dist %>/node/Stopwatch.js": [ "<%= paths.dist %>/node/Stopwatch.js" ]
         }
       }
 
@@ -60,8 +60,8 @@ module.exports = function(grunt) {
         }
 
         , files: {
-            "<%= paths.dist %>/browser/Timer.js": [ "<%= paths.dist %>/browser/Timer.js" ]
-          , "<%= paths.dist %>/browser/Timer.min.js": [ "<%= paths.dist %>/browser/Timer.min.js" ]
+            "<%= paths.dist %>/browser/Stopwatch.js": [ "<%= paths.dist %>/browser/Stopwatch.js" ]
+          , "<%= paths.dist %>/browser/Stopwatch.min.js": [ "<%= paths.dist %>/browser/Stopwatch.min.js" ]
         }
       }
     }
@@ -70,7 +70,7 @@ module.exports = function(grunt) {
       js: {
           files: [
             "<%= paths.lib %>/EventEmitter/EventEmitter.js"
-            , "<%= paths.lib %>/Timer.js"
+            , "<%= paths.lib %>/Stopwatch.js"
           ]
         , tasks: [ "concat:app", "jshint", "uglify", "karma:unit:run" ]
       }
@@ -86,7 +86,7 @@ module.exports = function(grunt) {
         options: {
           // Default compress options. Listed for reference.
           compress: {
-            loops        : true
+            loops          : true
             , unused       : true
             , unsafe       : true
             , cascade      : true
@@ -105,11 +105,11 @@ module.exports = function(grunt) {
           }
 
           , mangle: {
-            except: [ "Timer", "EventEmitter" ]
+            except: [ "Stopwatch", "EventEmitter" ]
           }
         }
         , files: {
-          "<%= paths.dist %>/browser/Timer.min.js": [ "<%= paths.dist %>/browser/Timer.js" ]
+          "<%= paths.dist %>/browser/Stopwatch.min.js": [ "<%= paths.dist %>/browser/Stopwatch.js" ]
         }
 
       }
@@ -119,7 +119,7 @@ module.exports = function(grunt) {
         options: { jshintrc: "./.jshintrc" }
       , all: [
         "<%= paths.lib %>/EventEmitter/EventEmitter.js"
-        , "<%= paths.lib %>/Timer.js"
+        , "<%= paths.lib %>/Stopwatch.js"
       ]
     }
 
