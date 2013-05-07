@@ -1,9 +1,12 @@
-/**
- * EventEmitter v4.0.5 - git.io/ee
- * Oliver Caldwell
- * MIT license
- * @preserve
- */
+/** stopwatch-emitter - v0.0.3 - https://github.com/brian-frichette/Stopwatch
+  * Copyright (c) 2013 Brian Frichette. All rights reserved.
+  * Licensed MIT - http://opensource.org/licenses/MIT
+  *
+  * EventEmitter - git.io/ee
+  * Oliver Caldwell
+  * MIT license
+  */
+
 
 ;(function(exports) {
     // JSHint config - http://www.jshint.com/

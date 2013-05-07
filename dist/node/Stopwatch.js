@@ -1,3 +1,7 @@
+/** stopwatch-emitter - v0.0.3 - https://github.com/brian-frichette/Stopwatch
+  * Copyright (c) 2013 Brian Frichette. All rights reserved.
+  * Licensed MIT - http://opensource.org/licenses/MIT
+  */
 EventEmitter = require('events').EventEmitter;
 /* global EventEmitter, Timer */
 

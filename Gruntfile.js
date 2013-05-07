@@ -139,6 +139,6 @@ module.exports = function(grunt) {
     , "uglify"
     , "concat:build_node"
     , "concat:build_browser"
-    , "karma"
+    , "karma:unit:run"
   ]);
 };

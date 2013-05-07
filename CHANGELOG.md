@@ -1,3 +1,9 @@
+v0.0.3
+Date: 05-06-2013
+Changes:
+
+  - Add EventEmitter for browser as submodule
+
 v0.0.2
 
 Date: 05-05-2013
