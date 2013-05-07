@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stopwatch Examples</title>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.6/angular.min.js"></script>
+  <script src="../dist/browser/Stopwatch.js"></script>
+  <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body ng-app="Stopwatch" ng-controller="StopwatchCtrl">
+
+  <div class="container">
+    <div class="row">
+      <div class="span12 example-column">
+        <div id="stopwatch" class="stopwatch">
+          <h1 class="counter">
+            <span class="time-value" ng-bind="currentTime()"></span>
+            <span class="time-unit">seconds</span>
+          </h1>
+          <div class="row-fluid">
+            <label class="setup-label">Setup stopwatch:</label>
+            <input type="number" value="60" ng-model="timeValue">
+            <select ng-model="timeUnit" ng-options="unit.value as unit.name for unit in timeUnits"></select>
+          </div>
+          <ul class="events row-fluid">
+            <li class="span3 start" ng-class="{'active': startFired}">Start Fired</li>
+            <li class="span3 stop" ng-class="{'active': stopFired}">Stop Fired</li>
+            <li class="span3 pause" ng-class="{'active': pauseFired}">Pause Fired</li>
+            <li class="span3 restart" ng-class="{'active': restartFired}">Restart Fired</li>
+          </ul>
+          <div class="row-fluid">
+            <button class="span3 btn btn-large btn-primary" ng-click="stopwatch.start()" ng-disabled="startDisabled()">Start</button>
+            <button class="span3 btn btn-large btn-inverse" ng-disabled="!stopwatch.isRunning()" ng-click="stopwatch.stop()">Stop</button>
+            <button class="span3 btn btn-large btn-warning" ng-disabled="!stopwatch.isRunning()" ng-click="stopwatch.pause()">Pause</button>
+            <button class="span3 btn btn-large btn-success" ng-click="stopwatch.restart()">Restart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<script src="js/sw.js"></script>
+</body>
+</html>

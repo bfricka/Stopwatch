@@ -1,3 +1,10 @@
+v0.0.4
+Date: 05-07-2013
+Changes:
+
+  - Fixed a number of edge cases and added unit tests for them
+  - Added examples
+
 v0.0.3
 Date: 05-06-2013
 Changes:

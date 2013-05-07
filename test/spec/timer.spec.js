@@ -120,6 +120,22 @@ describe('Stopwatch behavior', function(){
     expect(totalTicks).toEqual(5);
   });
 
+  it ('should not emit "stop" unless currently running', function(){
+    var stopCalled = 0;
+    var stopwatch = new Stopwatch('5s');
+
+    stopwatch.on('stop', function(){
+      stopCalled++;
+    });
+
+    stopwatch.start();
+    jasmine.Clock.tick(1000);
+    stopwatch.stop();
+    stopwatch.stop();
+
+    expect(stopCalled).toEqual(1);
+  });
+
   it('should only emit "stop" once when method is called and once when timer runs out', function(){
     var stopCalled = 0;
     var stopwatch = new Stopwatch('5s');
@@ -184,5 +200,35 @@ describe('Stopwatch getters and booleans', function() {
     stopwatch.restart();
     jasmine.Clock.tick(60000);
     expect(stopwatch.isRunning()).toBe(false);
+  });
+
+  it('should ignore additional "start" calls', function(){
+    stopwatch.start();
+    jasmine.Clock.tick(1000);
+    stopwatch.start();
+    stopwatch.start();
+    expect(stopwatch.getCurrentTime()).toEqual(1);
+  });
+
+  it('should clear any queued timeouts when "stop" or "pause" is called', function(){
+    stopwatch.start();
+    jasmine.Clock.tick(1000);
+    stopwatch.stop();
+    expect(stopwatch.getCurrentTime()).toEqual(0);
+
+    stopwatch.start();
+    jasmine.Clock.tick(1000);
+    stopwatch.pause();
+    expect(stopwatch.getCurrentTime()).toEqual(1);
+  });
+
+  it('should clear any timeouts when "restart" is called', function(){
+    stopwatch.start();
+    jasmine.Clock.tick(1000);
+    stopwatch.restart();
+    expect(stopwatch.getCurrentTime()).toEqual(0);
+
+    jasmine.Clock.tick(5000);
+    expect(stopwatch.getCurrentTime()).toEqual(5);
   });
 });
