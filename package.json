@@ -1,7 +1,7 @@
 {
   "name": "stopwatch-emitter"
   , "description": "Just a stopwatch-like timer class"
-  , "version": "0.0.3"
+  , "version": "0.0.4"
   , "private": false
   , "author": "Brian Frichette"
   , "homepage": "https://github.com/brian-frichette/Stopwatch"
