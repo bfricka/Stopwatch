@@ -29,8 +29,11 @@ app.controller('StopwatchCtrl', [
 
     $scope.timeUnit = $scope.timeUnits[0].value;
     $scope.timeValue = 5;
+    $scope.stopwatch = createStopwatch();
 
-    $scope.stopwatch = createStopWatch();
+    $scope.refreshStopwatch = function() {
+      $scope.stopwatch = createStopwatch();
+    };
 
     $scope.timeLabel = function() {
       var len = $scope.timeUnits.length
@@ -55,15 +58,6 @@ app.controller('StopwatchCtrl', [
       $scope.stopwatch.start();
     };
 
-    $scope.stopwatch.on('start', function(){ $scope.safeApply(emitAddClass('start')); });
-    $scope.stopwatch.on('stop', function(){ $scope.safeApply(emitAddClass('stop')); });
-    $scope.stopwatch.on('pause', function(){ $scope.safeApply(emitAddClass('pause')); });
-    $scope.stopwatch.on('restart', function(){ $scope.safeApply(emitAddClass('restart')); });
-
-    $scope.stopwatch.on('tick', function(){
-      $scope.safeApply();
-    });
-
     $scope.startDisabled = function() {
       return ($scope.stopwatch.getCurrentTime() >= $scope.stopwatch.getMaxTime());
     };
@@ -77,9 +71,17 @@ app.controller('StopwatchCtrl', [
       }, 400);
     }
 
-    function createStopWatch() {
+    function createStopwatch() {
       var time = "" + $scope.timeValue + $scope.timeUnit;
-      return new Stopwatch(time);
+      var stopwatch = new Stopwatch(time);
+
+      stopwatch.on('start', function(){ $scope.safeApply(emitAddClass('start')); });
+      stopwatch.on('stop', function(){ $scope.safeApply(emitAddClass('stop')); });
+      stopwatch.on('pause', function(){ $scope.safeApply(emitAddClass('pause')); });
+      stopwatch.on('restart', function(){ $scope.safeApply(emitAddClass('restart')); });
+      stopwatch.on('tick', function(){ $scope.safeApply(); });
+
+      return stopwatch;
     }
   }
 ]);

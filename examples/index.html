@@ -15,13 +15,15 @@
       <div class="span12 example-column">
         <div id="stopwatch" class="stopwatch">
           <h1 class="counter">
-            <span class="time-value" ng-bind="currentTime()"></span>
-            <span class="time-unit">seconds</span>
+            <span class="time-value" ng-bind="stopwatch.getCurrentTime()"></span>
+            <span class="time-unit">seconds elapsed.</span>
+            <span class="time-value" ng-bind="stopwatch.getRemainingTime()"></span>
+            <span class="time-unit">seconds remaining.</span>
           </h1>
           <div class="row-fluid">
             <label class="setup-label">Setup stopwatch:</label>
-            <input type="number" value="60" ng-model="timeValue">
-            <select ng-model="timeUnit" ng-options="unit.value as unit.name for unit in timeUnits"></select>
+            <input type="number" value="60" ng-model="timeValue" ng-change="refreshStopwatch()">
+            <select ng-model="timeUnit" ng-options="unit.value as unit.name for unit in timeUnits" ng-change="refreshStopwatch()"></select>
           </div>
           <ul class="events row-fluid">
             <li class="span3 start" ng-class="{'active': startFired}">Start Fired</li>
