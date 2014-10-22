@@ -1,26 +1,28 @@
 {
-    "sub"      : true
-  , "boss"     : true
-  , "expr"     : true
-  , "node"     : true
-  , "devel"    : true
-  , "curly"    : false
-  , "immed"    : true
-  , "noarg"    : true
-  , "undef"    : true
-  , "newcap"   : true
-  , "shadow"   : true
-  , "newcap"   : false
-  , "eqnull"   : true
-  , "jquery"   : true
-  , "eqeqeq"   : true
-  , "browser"  : true
-  , "latedef"  : false
-  , "supernew" : true
-  , "laxcomma" : true
-  , "laxbreak" : true
-  , "globals"  : {
-      "Stopwatch"    : true
-    , "EventEmitter" : true
+  "sub"      : true,
+  "boss"     : true,
+  "expr"     : true,
+  "node"     : true,
+  "devel"    : true,
+  "curly"    : false,
+  "immed"    : true,
+  "mocha"    : true,
+  "noarg"    : true,
+  "undef"    : true,
+  "newcap"   : true,
+  "esnext"   : true,
+  "shadow"   : true,
+  "newcap"   : false,
+  "eqnull"   : true,
+  "jquery"   : true,
+  "eqeqeq"   : false,
+  "browser"  : true,
+  "latedef"  : false,
+  "supernew" : true,
+  "laxcomma" : false,
+  "laxbreak" : true,
+  "lastsemic": true,
+  "globals"  : {
+    "chai": true
   }
 }
