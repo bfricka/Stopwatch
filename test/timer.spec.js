@@ -129,6 +129,17 @@ describe('Stopwatch:', function() {
       });
     });
 
+    describe('Stopwatch#on("restart")', function () {
+      it('should fire restart', function () {
+        var restartHandler = sinon.spy();
+        stopwatch.on('restart', restartHandler);
+
+        stopwatch.restart();
+        stopwatch.restart();
+        expect(restartHandler).to.have.been.calledTwice;
+      });
+    });
+
     describe('Stopwatch#on("stop")', function () {
       var stopHandler;
 
@@ -236,72 +247,85 @@ describe('Stopwatch:', function() {
       expect(stopHandler).to.have.been.calledOnce;
     });
 
-    // it('should clear any queued timeouts when "stop" or "pause" is called', function(){
-    //   stopwatch.start();
-    //   jasmine.Clock.tick(1000);
-    //   stopwatch.stop();
-    //   expect(stopwatch.getCurrentTime()).toEqual(0);
+    it('should clear interval when "stop" or "pause" is called', function(){
+      stopwatch.start();
+      clock.tick(1000);
+      stopwatch.stop();
+      expect(stopwatch.currentTime()).to.equal(0);
 
-    //   stopwatch.start();
-    //   jasmine.Clock.tick(1000);
-    //   stopwatch.pause();
-    //   expect(stopwatch.getCurrentTime()).toEqual(1);
-    // });
+      stopwatch.start();
+      clock.tick(1000);
+      stopwatch.pause();
+      expect(stopwatch.currentTime()).to.equal(1);
+    });
 
-    // it('should clear any timeouts when "restart" is called', function(){
-    //   stopwatch.start();
-    //   jasmine.Clock.tick(1000);
-    //   stopwatch.restart();
-    //   expect(stopwatch.getCurrentTime()).toEqual(0);
+    it('should clear interval when "restart" is called', function(){
+      stopwatch.start();
+      clock.tick(1000);
+      stopwatch.restart();
+      expect(stopwatch.currentTime()).to.equal(0);
 
-    //   jasmine.Clock.tick(5000);
-    //   expect(stopwatch.getCurrentTime()).toEqual(5);
-    // });
+      clock.tick(5000);
+      expect(stopwatch.currentTime()).to.equal(5);
+    });
+  });
+
+  describe('Getters:', function() {
+    beforeEach(function () {
+      stopwatch.maxTime('60s');
+    });
+
+    it('should report the correct getters for start, max, and remaining', function(){
+      stopwatch.start();
+      clock.tick(5000);
+
+      expect(stopwatch.currentTime()).to.equal(5);
+      expect(stopwatch.remainingTime()).to.equal(55);
+      expect(stopwatch.maxTime()).to.equal(60);
+    });
+
+    it('should correctly report if it is running or not', function(){
+      expect(stopwatch.isRunning()).to.be.false;
+
+      stopwatch.start();
+      expect(stopwatch.isRunning()).to.be.true;
+
+      stopwatch.pause();
+      expect(stopwatch.isRunning()).to.be.false;
+
+      stopwatch.start();
+      expect(stopwatch.isRunning()).to.be.true;
+
+      stopwatch.stop();
+      expect(stopwatch.isRunning()).to.be.false;
+    });
+
+    it('should correctly report if it is paused or not', function() {
+      expect(stopwatch.isPaused()).to.be.false;
+
+      stopwatch.start();
+      stopwatch.pause();
+      expect(stopwatch.isPaused()).to.be.true;
+
+      stopwatch.stop();
+      expect(stopwatch.isPaused()).to.be.false;
+
+      stopwatch.start();
+      stopwatch.pause();
+      stopwatch.start();
+      expect(stopwatch.isPaused()).to.be.false;
+    });
+  });
+
+  describe('Setters:', function () {
+    it('should set max time when called with a value', function () {
+      expect(stopwatch.maxTime('5s')).to.equal(5);
+      expect(stopwatch.maxTime('5m')).to.equal(5 * 60);
+    });
+
+    it('should set currentTime when called with a value', function () {
+      expect(stopwatch.currentTime()).to.equal(0);
+      expect(stopwatch.currentTime(10)).to.equal(10);
+    });
   });
 });
-
-// describe('Stopwatch getters and booleans', function() {
-//   var stopwatch;
-
-//   beforeEach(function(){
-//     stopwatch = new Stopwatch('60s');
-//     jasmine.Clock.useMock();
-//   });
-
-//   it('should report the correct getters for start, max, and remaining', function(){
-//     stopwatch.start();
-//     jasmine.Clock.tick(5000);
-
-//     expect(stopwatch.getCurrentTime()).toEqual(5);
-//     expect(stopwatch.getRemainingTime()).toEqual(55);
-//     expect(stopwatch.getMaxTime()).toEqual(60);
-//   });
-
-//   it('should correctly report if it is running or not', function(){
-//     expect(stopwatch.isRunning()).toBe(false);
-
-//     stopwatch.start();
-//     expect(stopwatch.isRunning()).toBe(true);
-//   });
-
-//   it('should correctly report if is not running when paused', function(){
-//     expect(stopwatch.isRunning()).toBe(false);
-
-//     stopwatch.start();
-//     jasmine.Clock.tick(5000);
-//     stopwatch.pause();
-
-//     expect(stopwatch.isRunning()).toBe(false);
-//   });
-
-//   it('should correctly report if it not running when stopped', function(){
-//     stopwatch.start();
-//     jasmine.Clock.tick(5000);
-//     stopwatch.stop();
-//     expect(stopwatch.isRunning()).toBe(false);
-
-//     stopwatch.restart();
-//     jasmine.Clock.tick(60000);
-//     expect(stopwatch.isRunning()).toBe(false);
-//   });
-// });

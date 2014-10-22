@@ -2460,45 +2460,31 @@ var Stopwatch = function Stopwatch() {
       writable: true,
       value: 0
     },
-    _stopEmitted: {
-      writable: true,
-      value: false
-    },
     _maxTime: {
       writable: true,
       value: parseTime(maxTime)
     }
   });
-  this._setupEvents();
 };
 var $Stopwatch = Stopwatch;
 ($traceurRuntime.createClass)(Stopwatch, {
-  _setupEvents: function() {
-    var $__0 = this;
-    var stopCb = (function() {
-      if ($__0._running) {
-        clearInterval($__0._interval);
-      }
-    });
-    this.on('start', stopCb);
-    this.on('restart', stopCb);
-  },
   pause: function() {
+    clearInterval(this._interval);
+    this._paused = true;
     if (!this._running) {
       return;
     }
     this._running = false;
-    this._paused = true;
     this.emit('pause');
   },
   stop: function() {
+    this._currentTime = this._maxTime;
+    clearInterval(this._interval);
     if (this.isStopped()) {
       return;
     }
     this._running = this._paused = false;
-    this._currentTime = 0;
     this.emit('stop');
-    clearInterval(this._interval);
   },
   restart: function() {
     this._currentTime = 0;
@@ -2514,6 +2500,7 @@ var $Stopwatch = Stopwatch;
     if (emit) {
       this.emit('start');
     }
+    clearInterval(this._interval);
     this._paused = false;
     this._running = true;
     this._interval = setInterval((function() {
@@ -2524,8 +2511,7 @@ var $Stopwatch = Stopwatch;
   },
   tick: function() {
     if (this.isFinished()) {
-      this.emit('stop');
-      this._running = false;
+      this.stop();
       return;
     }
     if (!this._running) {
@@ -2533,7 +2519,10 @@ var $Stopwatch = Stopwatch;
     }
     this.emit('tick');
   },
-  currentTime: function() {
+  currentTime: function(currentTime) {
+    if (currentTime != null) {
+      this._currentTime = currentTime;
+    }
     return this._currentTime;
   },
   remainingTime: function() {

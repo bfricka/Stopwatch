@@ -51,58 +51,36 @@ export class Stopwatch extends events.EventEmitter {
         value: 0
       },
 
-      _stopEmitted: {
-        writable: true,
-        value: false
-      },
-
       _maxTime: {
         writable: true,
         value: parseTime(maxTime)
       }
     });
-
-    this._setupEvents();
-  }
-
-  // Setup some instance events
-  _setupEvents() {
-    // // Make sure to toggle stopEmitted we any other event fires
-    // // Also, clear any timeouts if we are already running.
-    var stopCb = () => {
-      // this._stopEmitted = false;
-
-      if (this._running) {
-        clearInterval(this._interval);
-      }
-    };
-
-
-    this.on('start', stopCb);
-    this.on('restart', stopCb);
   }
 
   pause() {
+    clearInterval(this._interval);
+    this._paused = true;
+
     if (!this._running) {
       return;
     }
 
     this._running = false;
-    this._paused = true;
 
     this.emit('pause');
   }
 
   stop() {
+    this._currentTime = this._maxTime;
+    clearInterval(this._interval);
+
     if (this.isStopped()) {
       return;
     }
 
     this._running = this._paused = false;
-    this._currentTime = 0;
-
     this.emit('stop');
-    clearInterval(this._interval);
   }
 
   restart() {
@@ -121,6 +99,8 @@ export class Stopwatch extends events.EventEmitter {
       this.emit('start');
     }
 
+    clearInterval(this._interval);
+
     this._paused = false;
     this._running = true;
 
@@ -134,11 +114,7 @@ export class Stopwatch extends events.EventEmitter {
 
   tick() {
     if (this.isFinished()) {
-      // If we reach the end
-      this.emit('stop');
-
-      // Make sure we're not running and return
-      this._running = false;
+      this.stop();
       return;
     }
 
@@ -151,7 +127,11 @@ export class Stopwatch extends events.EventEmitter {
     this.emit('tick');
   }
 
-  currentTime() {
+  currentTime(currentTime) {
+    if (currentTime != null) {
+      this._currentTime = currentTime;
+    }
+
     return this._currentTime;
   }
 
