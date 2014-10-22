@@ -29,66 +29,80 @@ function parseTime(time) {
 export class Stopwatch extends events.EventEmitter {
   constructor (maxTime = '5m') {
     super();
-    this._currentTime = 0;
-    this._stopEmitted = false;
-    this._running = false;
-    this._paused = false;
-    this._toQ = [];
-    this._maxTime = parseTime(maxTime);
+
+    Object.defineProperties(this, {
+      _paused: {
+        writable: true,
+        value: false
+      },
+
+      _running: {
+        writable: true,
+        value: false
+      },
+
+      _interval: {
+        writable: true,
+        value: null
+      },
+
+      _currentTime: {
+        writable: true,
+        value: 0
+      },
+
+      _stopEmitted: {
+        writable: true,
+        value: false
+      },
+
+      _maxTime: {
+        writable: true,
+        value: parseTime(maxTime)
+      }
+    });
 
     this._setupEvents();
   }
 
   // Setup some instance events
   _setupEvents() {
-    // Stop emitted tells us we specifically called stop
-    // so the we don't emit twice.
-    this.on('stop', () => {
-      this._stopEmitted = true;
-      this.clear();
-    });
-
-    // Make sure to toggle stopEmitted we any other event fires
-    // Also, clear any timeouts if we are already running.
+    // // Make sure to toggle stopEmitted we any other event fires
+    // // Also, clear any timeouts if we are already running.
     var stopCb = () => {
-      this._stopEmitted = false;
+      // this._stopEmitted = false;
 
       if (this._running) {
-        this.clear();
+        clearInterval(this._interval);
       }
     };
 
+
     this.on('start', stopCb);
-    this.on('pause', stopCb);
     this.on('restart', stopCb);
   }
 
-  // Clear the timeout queue
-  clear() {
-    var q = this._toQ;
-
-    while(q.length) {
-      clearTimeout(q[q.length - 1]);
-      q.pop();
-    }
-  }
-
   pause() {
-    if (!this._running) return;
-    this._running = false;
-    this._paused = true;
-    this.emit('pause');
-  }
-
-  stop() {
-    if (!this._running && !this._paused) {
+    if (!this._running) {
       return;
     }
 
     this._running = false;
+    this._paused = true;
+
+    this.emit('pause');
+  }
+
+  stop() {
+    if (this.isStopped()) {
+      return;
+    }
+
+    this._running = this._paused = false;
     this._currentTime = 0;
 
     this.emit('stop');
+    clearInterval(this._interval);
   }
 
   restart() {
@@ -99,33 +113,42 @@ export class Stopwatch extends events.EventEmitter {
   }
 
   start(emit = true) {
-    if ((this._running && emit) || this._currentTime >= this._maxTime) return;
-    if (emit) this.emit('start');
-    this._running = true;
-    this.tick();
-  }
-
-  tick() {
-    if (this._currentTime >= this._maxTime) {
-      if (!this._stopEmitted) this.emit('stop'); // If we reach the end
-      this._running = false; // Make sure we're not running and return
+    if ((emit && this._running) || this.isFinished()) {
       return;
     }
 
-    // Make sure nothing naughty gets through
-    if (!this._running) return;
+    if (emit) {
+      this.emit('start');
+    }
 
-    // Emit the tick
-    this.emit('tick');
+    this._paused = false;
+    this._running = true;
 
-    // Store the timeout so we can clear it later if necessary
-    var tO = setTimeout(() => {
+    this._interval = setInterval(() => {
       this._currentTime++;
       this.tick();
     }, 1000);
 
-    // Push to timeout queue
-    this._toQ.push(tO);
+    this.tick();
+  }
+
+  tick() {
+    if (this.isFinished()) {
+      // If we reach the end
+      this.emit('stop');
+
+      // Make sure we're not running and return
+      this._running = false;
+      return;
+    }
+
+    // Make sure nothing naughty gets through
+    if (!this._running) {
+      return;
+    }
+
+    // Emit the tick
+    this.emit('tick');
   }
 
   currentTime() {
@@ -144,11 +167,19 @@ export class Stopwatch extends events.EventEmitter {
     return this._maxTime;
   }
 
+  isFinished() {
+    return this._currentTime >= this._maxTime;
+  }
+
   isPaused() {
     return this._paused;
   }
 
   isRunning() {
     return this._running;
+  }
+
+  isStopped() {
+    return !this._running && !this._paused;
   }
 }

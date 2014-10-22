@@ -2443,53 +2443,62 @@ function parseTime(time) {
 var Stopwatch = function Stopwatch() {
   var maxTime = arguments[0] !== (void 0) ? arguments[0] : '5m';
   $traceurRuntime.superCall(this, $Stopwatch.prototype, "constructor", []);
-  this._currentTime = 0;
-  this._stopEmitted = false;
-  this._running = false;
-  this._paused = false;
-  this._toQ = [];
-  this._maxTime = parseTime(maxTime);
+  Object.defineProperties(this, {
+    _paused: {
+      writable: true,
+      value: false
+    },
+    _running: {
+      writable: true,
+      value: false
+    },
+    _interval: {
+      writable: true,
+      value: null
+    },
+    _currentTime: {
+      writable: true,
+      value: 0
+    },
+    _stopEmitted: {
+      writable: true,
+      value: false
+    },
+    _maxTime: {
+      writable: true,
+      value: parseTime(maxTime)
+    }
+  });
   this._setupEvents();
 };
 var $Stopwatch = Stopwatch;
 ($traceurRuntime.createClass)(Stopwatch, {
   _setupEvents: function() {
     var $__0 = this;
-    this.on('stop', (function() {
-      $__0._stopEmitted = true;
-      $__0.clear();
-    }));
     var stopCb = (function() {
-      $__0._stopEmitted = false;
       if ($__0._running) {
-        $__0.clear();
+        clearInterval($__0._interval);
       }
     });
     this.on('start', stopCb);
-    this.on('pause', stopCb);
     this.on('restart', stopCb);
   },
-  clear: function() {
-    var q = this._toQ;
-    while (q.length) {
-      clearTimeout(q[$traceurRuntime.toProperty(q.length - 1)]);
-      q.pop();
-    }
-  },
   pause: function() {
-    if (!this._running)
+    if (!this._running) {
       return;
+    }
     this._running = false;
     this._paused = true;
     this.emit('pause');
   },
   stop: function() {
-    if (!this._running && !this._paused) {
+    if (this.isStopped()) {
       return;
     }
-    this._running = false;
+    this._running = this._paused = false;
     this._currentTime = 0;
     this.emit('stop');
+    clearInterval(this._interval);
   },
   restart: function() {
     this._currentTime = 0;
@@ -2498,29 +2507,31 @@ var $Stopwatch = Stopwatch;
   },
   start: function() {
     var emit = arguments[0] !== (void 0) ? arguments[0] : true;
-    if ((this._running && emit) || this._currentTime >= this._maxTime)
-      return;
-    if (emit)
-      this.emit('start');
-    this._running = true;
-    this.tick();
-  },
-  tick: function() {
     var $__0 = this;
-    if (this._currentTime >= this._maxTime) {
-      if (!this._stopEmitted)
-        this.emit('stop');
-      this._running = false;
+    if ((emit && this._running) || this.isFinished()) {
       return;
     }
-    if (!this._running)
-      return;
-    this.emit('tick');
-    var tO = setTimeout((function() {
+    if (emit) {
+      this.emit('start');
+    }
+    this._paused = false;
+    this._running = true;
+    this._interval = setInterval((function() {
       $__0._currentTime++;
       $__0.tick();
     }), 1000);
-    this._toQ.push(tO);
+    this.tick();
+  },
+  tick: function() {
+    if (this.isFinished()) {
+      this.emit('stop');
+      this._running = false;
+      return;
+    }
+    if (!this._running) {
+      return;
+    }
+    this.emit('tick');
   },
   currentTime: function() {
     return this._currentTime;
@@ -2534,10 +2545,16 @@ var $Stopwatch = Stopwatch;
     }
     return this._maxTime;
   },
+  isFinished: function() {
+    return this._currentTime >= this._maxTime;
+  },
   isPaused: function() {
     return this._paused;
   },
   isRunning: function() {
     return this._running;
+  },
+  isStopped: function() {
+    return !this._running && !this._paused;
   }
 }, {}, events.EventEmitter);

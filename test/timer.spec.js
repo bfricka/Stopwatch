@@ -98,43 +98,126 @@ describe('Stopwatch:', function() {
       stopwatch.maxTime('5s');
     });
 
-    it('should fire `start` when timer goes from stopped / paused to started', function() {
-      var startHandler = sinon.spy();
+    describe('Stopwatch#on("start")', function () {
+      var startHandler;
 
-      stopwatch.on('start', startHandler);
-      expect(startHandler).not.to.have.been.called;
+      beforeEach(function () {
+        startHandler = sinon.spy();
+        stopwatch.on('start', startHandler);
+      });
 
-      stopwatch.start();
-      stopwatch.start();
-      expect(startHandler).to.have.been.calledOnce;
+      it('should fire only once per transition between stopped/paused and start', function () {
+        stopwatch.start();
+        stopwatch.start();
+        expect(startHandler).to.have.been.calledOnce;
+      });
 
-      stopwatch.pause();
-      stopwatch.start();
-      expect(startHandler).to.have.been.calledTwice;
+      it('should be fired from paused states', function () {
+        stopwatch.start();
+        stopwatch.pause();
+        stopwatch.start();
 
-      stopwatch.stop();
-      stopwatch.start();
-      expect(startHandler).to.have.been.calledThrice;
+        expect(startHandler).to.have.been.calledTwice;
+      });
+
+      it('should be fired from stopped states', function () {
+        stopwatch.start();
+        stopwatch.stop();
+        stopwatch.start();
+
+        expect(startHandler).to.have.been.calledTwice;
+      });
     });
 
-    it('should fire `stop` when timer goes from started / paused to stopped', function() {
-      var stopHandler = sinon.spy();
+    describe('Stopwatch#on("stop")', function () {
+      var stopHandler;
 
-      stopwatch.on('stop', stopHandler);
-      expect(stopHandler).not.to.have.been.called;
+      beforeEach(function () {
+        stopHandler = sinon.spy();
+        stopwatch.on('stop', stopHandler);
+      });
 
-      stopwatch.stop();
-      expect(stopHandler).not.to.have.been.called;
+      it('should not fire unless stopwatch has been started', function () {
+        stopwatch.stop();
+        expect(stopHandler).not.to.have.been.called;
+      });
 
-      stopwatch.start();
-      stopwatch.stop();
-      stopwatch.stop();
-      expect(stopHandler).to.have.been.calledOnce;
+      it('should only fire once per stoppage', function () {
+        stopwatch.start();
+        stopwatch.stop();
+        stopwatch.stop();
 
-      stopwatch.start();
-      stopwatch.pause();
-      stopwatch.stop();
-      expect(stopHandler).to.have.been.calledTwice;
+        expect(stopHandler).to.have.been.calledOnce;
+      });
+
+      it('should stop even when paused', function () {
+        stopwatch.start();
+        stopwatch.pause();
+        stopwatch.stop();
+
+        expect(stopHandler).to.have.been.calledOnce;
+      });
+
+      it('should reset Stopwatch#currentTime', function () {
+        stopwatch.start();
+        clock.tick(1000);
+        expect(stopwatch.currentTime()).to.equal(1);
+
+        stopwatch.stop();
+        expect(stopwatch.currentTime()).to.equal(0);
+      });
+    });
+
+    describe('Stopwatch#on("pause")', function () {
+      var pauseHandler;
+
+      beforeEach(function () {
+        pauseHandler = sinon.spy();
+        stopwatch.on('pause', pauseHandler);
+      });
+
+      it('should not fire unless stopwatch has been started', function () {
+        stopwatch.pause();
+        expect(pauseHandler).not.to.have.been.called;
+      });
+
+      it('should not fire when stopped', function () {
+        stopwatch.start();
+        stopwatch.stop();
+        stopwatch.pause();
+
+        expect(pauseHandler).not.to.have.been.called;
+      });
+
+      it('should fire only once per pause', function () {
+        stopwatch.start();
+        stopwatch.pause();
+        stopwatch.pause();
+        expect(pauseHandler).to.have.been.calledOnce;
+
+        stopwatch.start();
+        stopwatch.pause();
+        stopwatch.pause();
+        expect(pauseHandler).to.have.been.calledTwice;
+      });
+    });
+
+    describe('Stopwatch#on("tick")', function () {
+      it('should call tick callback correctly', function() {
+        var tickHandler = sinon.spy();
+
+        stopwatch.on('tick', tickHandler);
+        expect(tickHandler).not.to.have.been.called;
+
+        stopwatch.start();
+        expect(tickHandler).to.have.been.calledOnce;
+
+        clock.tick(1000);
+        expect(tickHandler).to.have.been.calledTwice;
+
+        clock.tick(4000);
+        expect(tickHandler).to.have.callCount(5);
+      });
     });
   });
 
@@ -143,69 +226,14 @@ describe('Stopwatch:', function() {
       stopwatch.maxTime('5s');
     });
 
-
-    it('should stop at maxTime and fire callback', function(){
+    it('should stop at maxTime', function(){
       var stopHandler = sinon.spy();
 
       stopwatch.on('stop', stopHandler);
-      expect(stopHandler).not.to.have.been.called;
-
       stopwatch.start();
       clock.tick(5000);
 
       expect(stopHandler).to.have.been.calledOnce;
-    });
-
-    it('should call tick callback correctly', function() {
-      var tickHandler = sinon.spy();
-
-      stopwatch.on('tick', tickHandler);
-      expect(tickHandler).not.to.have.been.called;
-
-      stopwatch.start();
-      expect(tickHandler).to.have.been.calledOnce;
-
-      clock.tick(1000);
-      expect(tickHandler).to.have.been.calledTwice;
-
-      clock.tick(4000);
-      expect(tickHandler).to.have.callCount(5);
-    });
-
-    it ('should not emit "stop" unless currently running', function() {
-      var stopHandler = sinon.spy();
-
-      stopwatch.on('stop', stopHandler);
-      stopwatch.stop();
-      expect(stopHandler).not.to.have.been.called;
-
-      stopwatch.start();
-      clock.tick(1000);
-      stopwatch.stop();
-      stopwatch.stop();
-      expect(stopHandler).to.have.been.calledOnce;
-    });
-
-    it('should only emit "stop" once when method is called and once when timer runs out', function() {
-      var stopHandler = sinon.spy();
-
-      stopwatch.on('stop', stopHandler);
-      stopwatch.start();
-      clock.tick(1000);
-      stopwatch.stop();
-      expect(stopHandler).to.have.been.calledOnce;
-
-      stopwatch.restart();
-      clock.tick(5000);
-      expect(stopHandler).to.have.been.calledTwice;
-    });
-
-    it('should ignore additional "start" calls', function(){
-      stopwatch.start();
-      clock.tick(1000);
-      stopwatch.start();
-      stopwatch.start();
-      expect(stopwatch.currentTime()).to.equal(1);
     });
 
     // it('should clear any queued timeouts when "stop" or "pause" is called', function(){
